@@ -9,7 +9,6 @@ test("desu" , () => {
         attackRank: 0,
         defenseRank: 0,
         typeMatch: true,
-        adaptability: false,
         critical: true,
         ranged: false,
         burn: false,

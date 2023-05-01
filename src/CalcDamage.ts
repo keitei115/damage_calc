@@ -38,7 +38,8 @@ export const AllyAbility = {
     attackOnePointFive: "attackOnePointFive", //がんじょうあご・テクニシャン・どくぼうそう・ねつぼうそう・メガランチャー
     sniper: "sniper", //スナイパー
     tintedLens: "tintedLens", //いろめがね
-    parentalBond: "parentalBond" //おやこあい
+    parentalBond: "parentalBond", //おやこあい
+    adaptability: "adaptability" //てきおうりょく
 } as const;
 
 //相手の特性
@@ -71,8 +72,10 @@ export const Compatibility = {
     notAny: 1,
     effective: 2,
     superEffective: 4,
+    superVeryEffective: 8,
     notEffective: 0.5,
     notVeryEffective: 0.25,
+    notVeryVeryEffective: 0.125,
     noEffect: 0
 } as const;
 
@@ -86,7 +89,6 @@ export class CalcPokemon {
 
     //ダメージにかかわる補正
     typeMatch: boolean; //タイプ一致
-    adaptability: boolean; //てきおうりょく
     critical: boolean; //急所
     ranged: boolean; //範囲・全体技
     burn: boolean; //やけど
@@ -130,7 +132,6 @@ export class CalcPokemon {
         attackRank: number;
         defenseRank: number;
         typeMatch: boolean;
-        adaptability: boolean;
         critical: boolean;
         ranged: boolean;
         burn: boolean;
@@ -168,7 +169,6 @@ export class CalcPokemon {
         this.attackRank = params.attackRank;
         this.defenseRank = params.defenseRank;
         this.typeMatch = params.typeMatch;
-        this.adaptability = params.adaptability;
         this.critical = params.critical;
         this.ranged = params.ranged;
         this.burn = params.burn;
@@ -326,8 +326,8 @@ export class CalcPokemon {
         else if (this.weather === Weather.weatherReinforce) damage = this.OverHalf(damage * 6144 / 4096);
         if (this.critical) damage = this.OverHalf(damage * 6144 / 4096);
         randomDamage = RandomCorrection.map(e => Math.floor(e * damage / 100));
-        if (this.typeMatch && this.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 8192 / 4096));
-        else if (this.typeMatch && !this.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 6144 / 4096));
+        if (this.typeMatch && this.allyAbility === AllyAbility.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 8192 / 4096));
+        else if (this.typeMatch && this.allyAbility !== AllyAbility.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 6144 / 4096));
         randomDamage = randomDamage.map(e => (Math.floor(e * this.compatibility)));
 
         if (this.burn) randomDamage = randomDamage.map(e => this.OverHalf(e * 2048 / 4096));
