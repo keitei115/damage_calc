@@ -1,4 +1,4 @@
-import {CalcPokemon,AllyItem,FoeItem,AllyAbility,FoeAbility,Weather,HelpingHand,Compatibility} from './CalcDamage';
+import {CalcPokemon,AllyItemFlag,FoeItemFlag,AllyAbilityFlag,FoeAbilityFlag,WeatherFlag,HelpingHand,Compatibility, FriendGuard} from './CalcDamage';
 
 test("desu" , () => {
     const calcPokemon = new CalcPokemon({
@@ -13,7 +13,6 @@ test("desu" , () => {
         ranged: false,
         burn: false,
         reflect: false,
-        friendGuard: false,
         mtwice: false,
         sandstorm: false,
         flowerGiftAttack: false,
@@ -29,12 +28,13 @@ test("desu" , () => {
         riseField: false,
         sport: false,
         doubleBattle: false,
-        allyItem: AllyItem.bandGlasses,
-        foeItem: FoeItem.notAny,
-        allyAbility: AllyAbility.notAny,
-        foeAbility: FoeAbility.notAny,
-        weather: Weather.notAny,
+        allyItem: AllyItemFlag.bandGlasses,
+        foeItem: FoeItemFlag.notAny,
+        allyAbility: AllyAbilityFlag.notAny,
+        foeAbility: FoeAbilityFlag.notAny,
+        weather: WeatherFlag.notAny,
         helpingHand: HelpingHand.notAny,
+        friendGuard: FriendGuard.notAny,
         compatibility: Compatibility.superEffective,
     });
     let a,b;

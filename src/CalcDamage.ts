@@ -1,5 +1,5 @@
 //味方の持ち物
-export const AllyItem = {
+export const AllyItemFlag = {
     notAny: "notAny", //持ち物なし
     expertBelt: "expertBelt", //たつじんのおび
     lifeOrb: "lifeOrb", //いのちのたま
@@ -16,7 +16,7 @@ export const AllyItem = {
 } as const;
 
 //相手の持ち物
-export const FoeItem = {
+export const FoeItemFlag = {
     notAny: "notAny", //持ち物なし
     berry: "berry", //弱点半減きのみ
     evioliteVest: "evioliteVest", //しんかのきせき・とつげきチョッキ
@@ -24,7 +24,7 @@ export const FoeItem = {
 } as const;
 
 //味方の特性
-export const AllyAbility = {
+export const AllyAbilityFlag = {
     notAny: "notAny", //特性なし
     statusAttackHalf: "statusAttackHalf", //スロースタート・よわき
     statusAttackOnePointFive: "statusAttackOnePointFive", //しんりょく・もうか・げきりゅう・むしのしらせ・はりきり・もらいび・サンパワー
@@ -43,7 +43,7 @@ export const AllyAbility = {
 } as const;
 
 //相手の特性
-export const FoeAbility = {
+export const FoeAbilityFlag = {
     notAny: "notAny", //特性なし
     statusDefenseOnePointFive: "statusDefenseOnePointFive", //くさのけがわ・ふしぎなうろこ
     thickFat: "thickFat", //あついしぼう
@@ -54,7 +54,7 @@ export const FoeAbility = {
 } as const;
 
 //天候
-export const Weather = {
+export const WeatherFlag = {
     notAny: "notAny", //通常時
     weatherReinforce: "weatherReinforce", //天候補正(強化)
     weatherWeak: "weatherWeak" //天候補正(弱体化)
@@ -65,6 +65,13 @@ export const HelpingHand = {
     notAny: "notAny", //てだすけなし
     one: "one", //てだすけ1つ目
     two: "two" //てだすけ2つ目
+} as const;
+
+//フレンドガード
+export const FriendGuard = {
+    notAny: "notAny", //フレンドガードなし
+    one: "one", //フレンドガード1つ目
+    two: "two" //フレンドガード2つ目
 } as const;
 
 //タイプ相性による倍率
@@ -93,7 +100,7 @@ export class CalcPokemon {
     ranged: boolean; //範囲・全体技
     burn: boolean; //やけど
     reflect: boolean; //リフレクター・ひかりのかべ
-    friendGuard: boolean; //フレンドガード
+    friendGuard: string; //フレンドガード
     mtwice: boolean; //穴を掘る→地震、ダイビング→波乗り、小さくなる→踏みつけの2倍
 
     //ステータスを上下させるシステム
@@ -136,7 +143,7 @@ export class CalcPokemon {
         ranged: boolean;
         burn: boolean;
         reflect: boolean;
-        friendGuard: boolean;
+        friendGuard: string;
         mtwice: boolean;
         sandstorm: boolean;
         flowerGiftAttack: boolean;
@@ -211,19 +218,19 @@ export class CalcPokemon {
         else baseDefense = Math.floor(baseDefense * 2 / (2 - this.defenseRank));
 
         //はりきり
-        if (this.allyAbility === AllyAbility.hustle) baseAttack = Math.floor(baseAttack * 6144 / 4096);
+        if (this.allyAbility === AllyAbilityFlag.hustle) baseAttack = Math.floor(baseAttack * 6144 / 4096);
 
         //攻撃ステータスの補正
         let statusAttackCorrectionValue = 4096;
 
-        if (this.allyAbility === AllyAbility.statusAttackHalf) statusAttackCorrectionValue = this.CorrectionValueCalculation(2048, statusAttackCorrectionValue);
-        if (this.allyAbility === AllyAbility.statusAttackOnePointFive) statusAttackCorrectionValue = this.CorrectionValueCalculation(6144, statusAttackCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.statusAttackHalf) statusAttackCorrectionValue = this.CorrectionValueCalculation(2048, statusAttackCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.statusAttackOnePointFive) statusAttackCorrectionValue = this.CorrectionValueCalculation(6144, statusAttackCorrectionValue);
         if (this.flowerGiftAttack) statusAttackCorrectionValue = this.CorrectionValueCalculation(6144, statusAttackCorrectionValue);
-        if (this.allyAbility === AllyAbility.guts) statusAttackCorrectionValue = this.CorrectionValueCalculation(6144, statusAttackCorrectionValue);
-        if (this.allyAbility === AllyAbility.statusTwice) statusAttackCorrectionValue = this.CorrectionValueCalculation(8192, statusAttackCorrectionValue);
-        if (this.foeAbility === FoeAbility.thickFat) statusAttackCorrectionValue = this.CorrectionValueCalculation(2048, statusAttackCorrectionValue);
-        if (this.allyItem === AllyItem.choice) statusAttackCorrectionValue = this.CorrectionValueCalculation(6144, statusAttackCorrectionValue);
-        if (this.allyItem === AllyItem.specialItemAttack) statusAttackCorrectionValue = this.CorrectionValueCalculation(8192, statusAttackCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.guts) statusAttackCorrectionValue = this.CorrectionValueCalculation(6144, statusAttackCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.statusTwice) statusAttackCorrectionValue = this.CorrectionValueCalculation(8192, statusAttackCorrectionValue);
+        if (this.foeAbility === FoeAbilityFlag.thickFat) statusAttackCorrectionValue = this.CorrectionValueCalculation(2048, statusAttackCorrectionValue);
+        if (this.allyItem === AllyItemFlag.choice) statusAttackCorrectionValue = this.CorrectionValueCalculation(6144, statusAttackCorrectionValue);
+        if (this.allyItem === AllyItemFlag.specialItemAttack) statusAttackCorrectionValue = this.CorrectionValueCalculation(8192, statusAttackCorrectionValue);
 
         baseAttack = this.OverHalf(baseAttack * statusAttackCorrectionValue / 4096.0);
 
@@ -233,10 +240,10 @@ export class CalcPokemon {
         //防御ステータスの補正
         let statusDefenseCorrectionValue = 4096;
 
-        if (this.foeAbility === FoeAbility.statusDefenseOnePointFive) statusDefenseCorrectionValue = this.CorrectionValueCalculation(6144, statusDefenseCorrectionValue);
+        if (this.foeAbility === FoeAbilityFlag.statusDefenseOnePointFive) statusDefenseCorrectionValue = this.CorrectionValueCalculation(6144, statusDefenseCorrectionValue);
         if (this.flowerGiftDefense) statusDefenseCorrectionValue = this.CorrectionValueCalculation(6144, statusDefenseCorrectionValue);
-        if (this.foeItem === FoeItem.evioliteVest) statusDefenseCorrectionValue = this.CorrectionValueCalculation(6144, statusDefenseCorrectionValue);
-        if (this.foeItem === FoeItem.specialItemDefense) statusDefenseCorrectionValue = this.CorrectionValueCalculation(8192, statusDefenseCorrectionValue);
+        if (this.foeItem === FoeItemFlag.evioliteVest) statusDefenseCorrectionValue = this.CorrectionValueCalculation(6144, statusDefenseCorrectionValue);
+        if (this.foeItem === FoeItemFlag.specialItemDefense) statusDefenseCorrectionValue = this.CorrectionValueCalculation(8192, statusDefenseCorrectionValue);
 
         baseDefense = this.OverHalf(baseDefense * statusDefenseCorrectionValue / 4096.0);
 
@@ -253,18 +260,18 @@ export class CalcPokemon {
 
         let powerCorrectionValue = 4096;
 
-        if (this.allyAbility === AllyAbility.attackZeroPointSevenFive) powerCorrectionValue = this.CorrectionValueCalculation(3072, powerCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.attackZeroPointSevenFive) powerCorrectionValue = this.CorrectionValueCalculation(3072, powerCorrectionValue);
         if (this.auraBreaker) powerCorrectionValue = this.CorrectionValueCalculation(3072, powerCorrectionValue);
-        if (this.allyAbility === AllyAbility.attackOnePointTwo) powerCorrectionValue = this.CorrectionValueCalculation(4915, powerCorrectionValue);
-        if (this.allyAbility === AllyAbility.attackOnePointTwoFive) powerCorrectionValue = this.CorrectionValueCalculation(5120, powerCorrectionValue);
-        if (this.allyAbility === AllyAbility.attackOnePointThree) powerCorrectionValue = this.CorrectionValueCalculation(5325, powerCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.attackOnePointTwo) powerCorrectionValue = this.CorrectionValueCalculation(4915, powerCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.attackOnePointTwoFive) powerCorrectionValue = this.CorrectionValueCalculation(5120, powerCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.attackOnePointThree) powerCorrectionValue = this.CorrectionValueCalculation(5325, powerCorrectionValue);
         if (this.aura) powerCorrectionValue = this.CorrectionValueCalculation(5448, powerCorrectionValue);
-        if (this.allyAbility === AllyAbility.attackOnePointFive) powerCorrectionValue = this.CorrectionValueCalculation(6144, powerCorrectionValue);
-        if (this.foeAbility === FoeAbility.defenseHalf) powerCorrectionValue = this.CorrectionValueCalculation(2048, powerCorrectionValue);
-        if (this.foeAbility === FoeAbility.defenseOnePointTwoFive) powerCorrectionValue = this.CorrectionValueCalculation(5120, powerCorrectionValue);
-        if (this.allyItem === AllyItem.bandGlasses) powerCorrectionValue = this.CorrectionValueCalculation(4505, powerCorrectionValue);
-        if (this.allyItem === AllyItem.plate) powerCorrectionValue = this.CorrectionValueCalculation(4915, powerCorrectionValue);
-        if (this.allyItem === AllyItem.jewel) powerCorrectionValue = this.CorrectionValueCalculation(5325, powerCorrectionValue);
+        if (this.allyAbility === AllyAbilityFlag.attackOnePointFive) powerCorrectionValue = this.CorrectionValueCalculation(6144, powerCorrectionValue);
+        if (this.foeAbility === FoeAbilityFlag.defenseHalf) powerCorrectionValue = this.CorrectionValueCalculation(2048, powerCorrectionValue);
+        if (this.foeAbility === FoeAbilityFlag.defenseOnePointTwoFive) powerCorrectionValue = this.CorrectionValueCalculation(5120, powerCorrectionValue);
+        if (this.allyItem === AllyItemFlag.bandGlasses) powerCorrectionValue = this.CorrectionValueCalculation(4505, powerCorrectionValue);
+        if (this.allyItem === AllyItemFlag.plate) powerCorrectionValue = this.CorrectionValueCalculation(4915, powerCorrectionValue);
+        if (this.allyItem === AllyItemFlag.jewel) powerCorrectionValue = this.CorrectionValueCalculation(5325, powerCorrectionValue);
         if (this.powerHalf) powerCorrectionValue = this.CorrectionValueCalculation(2048, powerCorrectionValue);
         if (this.powerOnePointFive) powerCorrectionValue = this.CorrectionValueCalculation(6144, powerCorrectionValue);
         if (this.helpingHand === HelpingHand.one) powerCorrectionValue = this.CorrectionValueCalculation(6144, powerCorrectionValue);
@@ -291,19 +298,23 @@ export class CalcPokemon {
         let damageCorrectionValuer = 4096;
         if (this.reflect && this.doubleBattle) damageCorrectionValuer = this.CorrectionValueCalculation(2732, damageCorrectionValuer);
         else if (this.reflect && !this.doubleBattle) damageCorrectionValuer = this.CorrectionValueCalculation(2048, damageCorrectionValuer);
-        if (this.allyAbility === AllyAbility.sniper && this.critical) damageCorrectionValuer = this.CorrectionValueCalculation(6144, damageCorrectionValuer);
-        if (this.allyAbility === AllyAbility.tintedLens) damageCorrectionValuer = this.CorrectionValueCalculation(8192, damageCorrectionValuer);
-        if (this.foeAbility === FoeAbility.mhalf) damageCorrectionValuer = this.CorrectionValueCalculation(2048, damageCorrectionValuer);
-        if (this.friendGuard) damageCorrectionValuer = this.CorrectionValueCalculation(3072, damageCorrectionValuer);
-        if (this.foeAbility === FoeAbility.mfilter) damageCorrectionValuer = this.CorrectionValueCalculation(3072, damageCorrectionValuer);
-        if (this.allyItem === AllyItem.metronomeTwo) damageCorrectionValuer = this.CorrectionValueCalculation(4915, damageCorrectionValuer);
-        else if (this.allyItem === AllyItem.metronomeThree) damageCorrectionValuer = this.CorrectionValueCalculation(5734, damageCorrectionValuer);
-        else if (this.allyItem === AllyItem.metronomeFour) damageCorrectionValuer = this.CorrectionValueCalculation(6553, damageCorrectionValuer);
-        else if (this.allyItem === AllyItem.metronomeFive) damageCorrectionValuer = this.CorrectionValueCalculation(7372, damageCorrectionValuer);
-        else if (this.allyItem === AllyItem.metronomeSix) damageCorrectionValuer = this.CorrectionValueCalculation(8192, damageCorrectionValuer);
-        if (this.allyItem === AllyItem.expertBelt) damageCorrectionValuer = this.CorrectionValueCalculation(4915, damageCorrectionValuer);
-        if (this.allyItem === AllyItem.lifeOrb) damageCorrectionValuer = this.CorrectionValueCalculation(5324, damageCorrectionValuer);
-        if (this.foeItem === FoeItem.berry) damageCorrectionValuer = this.CorrectionValueCalculation(2048, damageCorrectionValuer);
+        if (this.allyAbility === AllyAbilityFlag.sniper && this.critical) damageCorrectionValuer = this.CorrectionValueCalculation(6144, damageCorrectionValuer);
+        if (this.allyAbility === AllyAbilityFlag.tintedLens) damageCorrectionValuer = this.CorrectionValueCalculation(8192, damageCorrectionValuer);
+        if (this.foeAbility === FoeAbilityFlag.mhalf) damageCorrectionValuer = this.CorrectionValueCalculation(2048, damageCorrectionValuer);
+        if (this.friendGuard === FriendGuard.one) damageCorrectionValuer = this.CorrectionValueCalculation(3072, damageCorrectionValuer);
+        else if (this.friendGuard === FriendGuard.two) {
+            damageCorrectionValuer = this.CorrectionValueCalculation(3072, damageCorrectionValuer);
+            damageCorrectionValuer = this.CorrectionValueCalculation(3072, damageCorrectionValuer);
+        }
+        if (this.foeAbility === FoeAbilityFlag.mfilter) damageCorrectionValuer = this.CorrectionValueCalculation(3072, damageCorrectionValuer);
+        if (this.allyItem === AllyItemFlag.metronomeTwo) damageCorrectionValuer = this.CorrectionValueCalculation(4915, damageCorrectionValuer);
+        else if (this.allyItem === AllyItemFlag.metronomeThree) damageCorrectionValuer = this.CorrectionValueCalculation(5734, damageCorrectionValuer);
+        else if (this.allyItem === AllyItemFlag.metronomeFour) damageCorrectionValuer = this.CorrectionValueCalculation(6553, damageCorrectionValuer);
+        else if (this.allyItem === AllyItemFlag.metronomeFive) damageCorrectionValuer = this.CorrectionValueCalculation(7372, damageCorrectionValuer);
+        else if (this.allyItem === AllyItemFlag.metronomeSix) damageCorrectionValuer = this.CorrectionValueCalculation(8192, damageCorrectionValuer);
+        if (this.allyItem === AllyItemFlag.expertBelt) damageCorrectionValuer = this.CorrectionValueCalculation(4915, damageCorrectionValuer);
+        if (this.allyItem === AllyItemFlag.lifeOrb) damageCorrectionValuer = this.CorrectionValueCalculation(5324, damageCorrectionValuer);
+        if (this.foeItem === FoeItemFlag.berry) damageCorrectionValuer = this.CorrectionValueCalculation(2048, damageCorrectionValuer);
         if (this.mtwice) damageCorrectionValuer = this.CorrectionValueCalculation(8192, damageCorrectionValuer);
         return damageCorrectionValuer;
     }
@@ -321,13 +332,13 @@ export class CalcPokemon {
         baseDamage = Math.floor(status / 50 + 2);
         damage = baseDamage;
         if (this.ranged && this.doubleBattle) damage = this.OverHalf(damage * 3072 / 4096);
-        if (this.allyAbility === AllyAbility.parentalBond) damage = this.OverHalf(damage * 2048 / 4096);
-        if (this.weather === Weather.weatherWeak) damage = this.OverHalf(damage * 2048 / 4096);
-        else if (this.weather === Weather.weatherReinforce) damage = this.OverHalf(damage * 6144 / 4096);
+        if (this.allyAbility === AllyAbilityFlag.parentalBond) damage = this.OverHalf(damage * 2048 / 4096);
+        if (this.weather === WeatherFlag.weatherWeak) damage = this.OverHalf(damage * 2048 / 4096);
+        else if (this.weather === WeatherFlag.weatherReinforce) damage = this.OverHalf(damage * 6144 / 4096);
         if (this.critical) damage = this.OverHalf(damage * 6144 / 4096);
         randomDamage = RandomCorrection.map(e => Math.floor(e * damage / 100));
-        if (this.typeMatch && this.allyAbility === AllyAbility.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 8192 / 4096));
-        else if (this.typeMatch && this.allyAbility !== AllyAbility.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 6144 / 4096));
+        if (this.typeMatch && this.allyAbility === AllyAbilityFlag.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 8192 / 4096));
+        else if (this.typeMatch && this.allyAbility !== AllyAbilityFlag.adaptability) randomDamage = randomDamage.map(e => this.OverHalf(e * 6144 / 4096));
         randomDamage = randomDamage.map(e => (Math.floor(e * this.compatibility)));
 
         if (this.burn) randomDamage = randomDamage.map(e => this.OverHalf(e * 2048 / 4096));
